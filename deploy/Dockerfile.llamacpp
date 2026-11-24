@@ -1,0 +1,14 @@
+# llama.cpp server с архитектурой Volta (sm_70).
+# CUDA 12.9 - последняя ветка, которая ещё собирает sm_70: CUDA 13 удаляет Volta.
+FROM nvidia/cuda:12.9.1-devel-ubuntu24.04 AS build
+ARG CUDA_ARCH=70
+RUN apt-get update && apt-get install -y git cmake build-essential && rm -rf /var/lib/apt/lists/*
+RUN git clone --depth 1 https://github.com/ggerganov/llama.cpp /src
+WORKDIR /src
+RUN cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCH} -DLLAMA_CURL=OFF \
+ && cmake --build build --config Release -j"$(nproc)"
+
+FROM nvidia/cuda:12.9.1-runtime-ubuntu24.04
+RUN apt-get update && apt-get install -y libgomp1 && rm -rf /var/lib/apt/lists/*
+COPY --from=build /src/build/bin/ /opt/llama/
+ENTRYPOINT ["/opt/llama/llama-server"]
