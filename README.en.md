@@ -46,4 +46,12 @@ docker compose -f deploy/docker-compose.yml up -d
   inside a prompt, so human review of prompts stays mandatory.
 - Benchmarks are single-node, single-card; no cluster results.
 
-Russian documentation: [README.md](README.md). License: MIT.
+## Related repositories
+
+| Repository | What it adds |
+|---|---|
+| [v100-field-notes](https://github.com/eightpaws/v100-field-notes) | the measurements the model-selection rules come from |
+| [it-infra-audit-kit](https://github.com/eightpaws/it-infra-audit-kit) | audit of AD, a hypervisor and backups: read-only, report with risk levels |
+| [eightpaws](https://github.com/eightpaws) | profile: what else is published |
+
+Russian documentation: [README.md](README.md). License: MIT for code (`LICENSE`), CC BY 4.0 for text and data (`LICENSE-DOCS`).

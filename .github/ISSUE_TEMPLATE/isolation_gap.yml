@@ -1,0 +1,38 @@
+name: Isolation gap
+description: A container in this stand reached something it should not
+title: "[isolation] "
+labels: ["isolation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A leak report is the most valuable issue this repository can get. Please include the checks that passed as well as the one that failed.
+  - type: input
+    id: versions
+    attributes:
+      label: Docker, compose and kernel version
+      description: docker --version, docker compose version, uname -r
+    validations:
+      required: true
+  - type: textarea
+    id: reached
+    attributes:
+      label: What was reachable
+      description: hostname, IP or port; say which bridge network the probe ran on
+    validations:
+      required: true
+  - type: textarea
+    id: script_output
+    attributes:
+      label: verify-isolation.sh output
+      description: Verbatim, not summarised
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command used to probe
+      render: shell
+    validations:
+      required: true
