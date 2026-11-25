@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Синтаксис скриптов
+        run: |
+          for f in scripts/*.sh; do bash -n "$f" && echo "ok: $f"; done
+
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          shellcheck -S warning scripts/*.sh
+
+      - name: Compose разбирается и не тянет образы
+        run: |
+          docker compose -f deploy/docker-compose.yml config > /tmp/compose.out
+          test -s /tmp/compose.out && echo "compose валиден"
+
+      - name: Сеть остаётся внутренней
+        run: |
+          # Контракт стенда: сеть обязана быть internal, порты - только на loopback.
+          # Проверяется по разобранной конфигурации, а не по тексту файла.
+          grep -A3 'closed:' /tmp/compose.out | grep -q 'internal: true' \
+            || { echo "::error::сеть closed не internal: стенд получит выход наружу"; exit 1; }
+          echo "internal: true на месте"
+
+      - name: Порты не публикуются в локальную сеть
+        run: |
+          if grep -E 'published: "0\.0\.0\.0|host_ip: 0\.0\.0\.0' /tmp/compose.out; then
+            echo "::error::порт опубликован наружу"; exit 1
+          fi
+          grep -c 'host_ip: 127.0.0.1' /tmp/compose.out | xargs -I{} echo "портов на loopback: {}"
+
+      - name: Сборка llama.cpp не сползла на sm_75
+        run: |
+          # CUDA 13 не собирает Volta: архитектура должна остаться 70.
+          grep -q 'CUDA_ARCH: "70"' deploy/docker-compose.yml \
+            || { echo "::error::CUDA_ARCH не 70, на V100 сборка не стартует"; exit 1; }
+          grep -q 'CMAKE_CUDA_ARCHITECTURES' deploy/Dockerfile.llamacpp \
+            || { echo "::error::Dockerfile не задаёт CUDA-архитектуру"; exit 1; }
+          echo "архитектура зафиксирована"
