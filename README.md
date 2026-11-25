@@ -1,5 +1,7 @@
 # Локальный LLM в закрытом контуре
 
+[![ci](https://github.com/eightpaws/onprem-llm-closed-loop/actions/workflows/ci.yml/badge.svg)](https://github.com/eightpaws/onprem-llm-closed-loop/actions/workflows/ci.yml)
+
 Стенд для организаций, где облака запрещены: модели работают на своём железе, контейнеры физически не имеют выхода в интернет, а невыход данных за периметр проверяется скриптом, а не обещанием.
 
 ## Задача, которую это решает
@@ -59,3 +61,5 @@ results/  замеры с этого стенда и ссылки на подр�
 ---
 
 **In English.** A closed-loop LLM deployment for environments where cloud services are banned: containers have no route to the internet by construction, and the absence of egress is verified by a script rather than promised. The measured rules of thumb for a 16 GB card (14B dense at 32k context, 30B MoE instead of dense 32B, `num_batch=2048`, prefix cache on, DRY off) come from raw measurements published in [v100-field-notes](https://github.com/eightpaws/v100-field-notes). Author: Anton Korovin, [korovin.info](https://korovin.info).
+
+English: [README.en.md](README.en.md).
